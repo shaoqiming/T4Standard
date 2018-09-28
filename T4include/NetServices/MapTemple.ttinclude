@@ -19,13 +19,13 @@ namespace <#=ProjectName#>.Map.<#=Namespace#>
     {
         public  <#=EntityName#>Map(string schema = "dbo")
         {
-            entityMap.ToTable(schema + ".<#=t.Name#>");
+            ToTable(schema + ".<#=t.Name#>");
      <#+
 
             if( primaryKey!=null)
             {#>
-    entityMap.HasKey(a => a.<#=primaryKey.Name #>);
-            entityMap.Property(a => a.<#=primaryKey.Name #>).HasColumnName("<#=primaryKey.Name #>").IsRequired().HasMaxLength(50);
+    HasKey(a => a.<#=primaryKey.Name #>);
+            Property(a => a.<#=primaryKey.Name #>).HasColumnName("<#=primaryKey.Name #>").IsRequired().HasMaxLength(50);
 <#+
             }
             foreach (Column c in t.Columns)

@@ -10,6 +10,7 @@
 #>
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using exin.FrameWork.Core.Common;
 using exin.FrameWork.Core.Pagination;

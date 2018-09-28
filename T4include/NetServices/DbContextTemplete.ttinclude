@@ -32,7 +32,7 @@ namespace Bronze.HiRead.Entities
 <#+
             }
 #>
-		#endegion 
+		#endregion 
 
 		#region 映射
         <#+
@@ -41,15 +41,12 @@ namespace Bronze.HiRead.Entities
                 //var className="Bronze.HiRead.Entities."+ (string.IsNullOrWhiteSpace(entity.Namespace)?"":entity.Namespace+".")+entity.EntityName;
     #>
 
-        /// <summary>
-        /// <#=entity.Description #>
-        /// </summary>
         modelBuilder.Configurations.Add(new <#=entity.EntityName#>Map());
     <#+
             }
     #>
 
-	#endegion 
+	#endregion 
     }
 }
 <#+

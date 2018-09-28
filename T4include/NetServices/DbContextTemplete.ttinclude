@@ -1,0 +1,60 @@
+﻿<#+
+    public class DbContextTemplete:CSharpTemplate
+    {
+       private System.Data.Entity.Design.PluralizationServices.PluralizationService service = System.Data.Entity.Design.PluralizationServices.PluralizationService.CreateService(System.Globalization.CultureInfo.GetCultureInfo("en-us"));
+
+        public List<ModelTemplate> Entitys = new List<ModelTemplate>();
+
+        public override string TransformText()
+        {
+#>
+
+using System.Data.Entity;
+using exin.Portal.EF.Core;
+using exin.Portal.EF.Data.Table;
+using exin.Portal.EF.DB.Map;
+
+namespace Bronze.HiRead.Entities
+{
+    public partial class HiReadEntities 
+    {
+		#region 属性
+<#+
+            foreach(ModelTemplate entity in  Entitys)
+            {
+                //var className="Bronze.HiRead.Entities."+ (string.IsNullOrWhiteSpace(entity.Namespace)?"":entity.Namespace+".")+entity.EntityName;
+#>
+
+        /// <summary>
+        /// <#=entity.Description #>
+        /// </summary>
+        public virtual IDbSet<<#=entity.EntityName#>Model> <#=entity.EntityName#> { get; set; }
+<#+
+            }
+#>
+		#endegion 
+
+		#region 映射
+        <#+
+            foreach(ModelTemplate entity in  Entitys)
+            {
+                //var className="Bronze.HiRead.Entities."+ (string.IsNullOrWhiteSpace(entity.Namespace)?"":entity.Namespace+".")+entity.EntityName;
+    #>
+
+        /// <summary>
+        /// <#=entity.Description #>
+        /// </summary>
+        modelBuilder.Configurations.Add(new <#=entity.EntityName#>Map());
+    <#+
+            }
+    #>
+
+	#endegion 
+    }
+}
+<#+
+            return this.GenerationEnvironment.ToString();
+        }
+
+    }
+#>

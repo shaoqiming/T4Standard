@@ -1,0 +1,295 @@
+﻿<#+
+    public static class UtilTemplate
+    {
+
+        public static string projectPath{get;set;}
+        public static string nameSpace{get;set;}
+        public static string entityName{get;set;}
+
+        //将template转化为文件
+        public static void Output(CSharpTemplate temp,string projectPath,string nameSpace,string entityName,string folderName,string FileName)
+        {
+            var Entitypath = string.Format(@"{0}\Code\{2}\{1}", projectPath,nameSpace,folderName);
+            temp.Output.Encoding = Encoding.UTF8;
+            temp.RenderToFile(Path.Combine(Entitypath, FileName));
+        }
+
+
+
+        public static void Output(CSharpTemplate temp,string folderName,string FileName)
+        {
+            UtilTemplate.Output(temp,UtilTemplate.projectPath,UtilTemplate.nameSpace,UtilTemplate.entityName,folderName,FileName);
+        }
+
+        public static bool IsBaseField(string name)
+        {
+            if(name=="CreateTime"||name=="CreateUser"||name=="DeleteTime"||name=="DeleteUser"||name=="UpdateTime"||name=="UpdateUser"||name=="UseValue1"||name=="UseValue2"||name=="TIMESSTAMP"||name=="IsDelete")
+            {
+                return true;
+            }else{
+                return false;
+            }         
+        }
+
+        //判断字段是否存在表中
+        public static bool isContain(Table t,string FileName)
+        {
+            bool isContain=false;
+            foreach (Column c in t.Columns)
+            {
+                if(c.Name==FileName)
+                {
+                    isContain=true;
+                }   
+            }
+
+            return isContain;
+        }
+
+
+        //将java的类型转化为数据库的类型
+        public static string GetSysType(string sqlType){
+            string sysType="string";
+            switch (sqlType) 
+            {
+                case "time":
+                    sysType ="TimeSpan";
+                    break;
+                case "timestamp":
+                    sysType = "byte[]";
+                    break;
+                case "bigint":
+                    sysType = "long";
+                    break;
+                case "smallint":
+                    sysType = "short";
+                    break;
+                case "int":
+                    sysType = "int";
+                    break;
+                case "uniqueidentifier":
+                    sysType = "Guid";
+                    break;
+                case "smalldatetime":
+                case "date":
+                case "datetime":
+                case "datetime2":
+                    sysType = "DateTime";
+                    break;
+                case "float":
+                    sysType = "double";
+                    break;
+                case "real":
+                    sysType = "Single";
+                    break;
+                case "numeric":
+                case "smallmoney":
+                case "decimal":
+                case "money":
+                    sysType = "decimal";
+                    break;
+                case "tinyint":
+                    sysType = "byte";
+                    break;
+                case "bit":
+                    sysType = "bool";
+                    break;
+                case "image":
+                case "binary":
+                case "varbinary":
+                case "rowversion":
+                    sysType = "byte[]";
+                    break;
+                case "ntext":
+                case "text":
+                case "nvarchar":
+                case "varchar":
+                case "nchar":
+                case "char":
+                    sysType = "string";
+                    break;
+                case "xml":
+                    sysType = "Xml";
+                    break;
+            }
+            return sysType;
+        }
+		
+        /// <summary>
+        ///看是否能获取到字段的数据长度
+        /// <summary>
+        public static bool GetStringLength(Column c)
+        {
+            string name=c.DataType.Name.ToLower();
+            if(name.Contains("max")||name=="text"||name=="ntext")
+            {
+                return false;
+            }
+            if(GetSysType(c.DataType.Name)=="string"&& c.DataType.MaximumLength>0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 去除description的注释部分，保留实际代表的意义。如(性别:1表示男， 0表示女)最后获取的结果是“性别”
+        /// </summary>
+        public static string  TirmDescription(string des)
+        {
+            string[] desArray = des.Split(new string[]{"\r\n",",",":","，","："},StringSplitOptions.RemoveEmptyEntries);
+            if(desArray.Length>0) return desArray[0];
+            return "";
+        }
+
+        /// <summary>
+        /// 替换描述中的特殊字符
+        /// </summary>
+        public static string ReplaceDescription(string des,string ident)
+        {
+            ident=ident??"";
+            return des.Replace("\r\n","\r\n"+ ident+"/// ");
+        }
+
+		
+        public static  bool IsMapTo(Column c,string mapName){
+            string ormDesc=GetColumnOrmDescription(c);
+            if(string.IsNullOrEmpty(ormDesc)) return false;
+            string[] strs = ormDesc.Split(':');
+            if(strs.Length>1 && strs[0].ToLower() =="map" && mapName.Equals(strs[1],StringComparison.CurrentCultureIgnoreCase)){
+                return true;
+            }
+            return false;
+        }
+
+        public static string GetTableDescription(Table t)
+        {
+            if (t.ExtendedProperties.Contains("MS_Description"))
+            {
+                return t.ExtendedProperties["MS_Description"].Value.ToString();
+            }
+            return "";
+        }
+
+        public static  string GetColumnDescription(Column t)
+        {
+            if (t.ExtendedProperties.Contains("MS_Description"))
+            {
+                return t.ExtendedProperties["MS_Description"].Value.ToString();
+            }
+            return "";
+        }
+
+        public static string GetColumnOrmDescription(Column t)
+        {
+            if (t.ExtendedProperties.Contains("ORM_Desc"))
+            {
+                return t.ExtendedProperties["ORM_Desc"].Value.ToString();
+            }
+            return "";
+        }
+
+        public static string CheckNullable(Column col){
+            string t=GetSysType(col.DataType.Name);
+            string result="";
+            if(col.Nullable && t !="byte[]" && t !="string")
+                result="?";
+            return result;
+        }
+
+        /// <summary>
+        /// 决定使用什么的基类
+        /// </summary>
+        public static string GetBaseClassName(Table t,out bool hasFCreateTime,out bool hasFDeleted)
+        {
+            hasFDeleted=false;hasFCreateTime=false;
+            foreach (Column c in t.Columns)
+            {
+                if(string.Equals( c.Name,"FDeleted",StringComparison.CurrentCultureIgnoreCase))
+                {
+                    hasFDeleted=true;
+                    continue;
+                }
+
+                if(string.Equals( c.Name,"FCreateTime",StringComparison.CurrentCultureIgnoreCase))
+                {
+                    hasFCreateTime=true;
+                    continue;
+                }
+
+                if (IsMapTo(c,"FCreateTime"))
+                {
+                    hasFCreateTime=true;
+                    continue;
+                }
+
+                if(IsMapTo(c,"FDeleted")) 
+                {
+                    hasFDeleted=true;
+                    continue;
+                }
+            }
+
+            if (hasFDeleted || hasFCreateTime)
+                return "CommonEntityBase";
+            else return "EntityBase";
+        }
+
+        //获取主键
+        public static Column GetPrimaryKey(Table t)
+        {
+            foreach (Column c in t.Columns)
+            {
+                if(c.InPrimaryKey)
+                {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+        public static bool IsMyWantTableName(string tName,IEnumerable<string> tables)
+        {
+            bool isMyWant=false;
+            foreach(string str in tables)
+            {
+                if(str.ToLower()==tName.ToLower())
+                {
+                    isMyWant=true;
+                    break;
+                }
+
+                var isMatched= System.Text.RegularExpressions.Regex.IsMatch( tName, str,System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Compiled);
+                if(isMatched)
+                {
+                    isMyWant=true;
+                    break;
+                }
+            }
+            return isMyWant;
+        }
+
+        public static bool IsMyWantTable(Table t,IEnumerable<string> tables)
+        {
+            if(t.IsSystemObject)
+                return false;
+            return IsMyWantTableName(t.Name,tables);
+        }
+
+
+
+
+
+        public static string CleanUp(string tableName,string RemoveFirstChar){
+            string result=tableName;
+            //strip blanks
+            result=result.Replace(" ","");
+            if(RemoveFirstChar.Length>0&& result.StartsWith(RemoveFirstChar, StringComparison.CurrentCultureIgnoreCase))
+            {
+                result=result.Remove(0,RemoveFirstChar.Length);
+            }
+            return result;
+        }
+
+    }
+#>

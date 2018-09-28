@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28016.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "T4GenerateCode", "T4GenerateCode.csproj", "{CFD2CA55-BA54-49B4-B0D7-03ABE458F2F3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CFD2CA55-BA54-49B4-B0D7-03ABE458F2F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFD2CA55-BA54-49B4-B0D7-03ABE458F2F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFD2CA55-BA54-49B4-B0D7-03ABE458F2F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFD2CA55-BA54-49B4-B0D7-03ABE458F2F3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CC921BCA-94E5-45C7-8A97-6D05E9097F70}
+	EndGlobalSection
+EndGlobal

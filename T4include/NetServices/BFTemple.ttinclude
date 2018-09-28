@@ -1,0 +1,132 @@
+﻿<#+
+    public class BFTemplate:Template
+    {
+	    public BFTemplate(Table table,IEnumerable<string> includeTables):base(table,includeTables)
+        {
+        }
+
+        public override string TransformText()
+        {
+#>
+using System;
+using System.Linq;
+using System.Linq.Expressions;
+using exin.FrameWork.Core.Common;
+using exin.FrameWork.Core.Pagination;
+using <#=ProjectName#>.DA.<#=Namespace#>;
+using <#=ProjectName#>.Data.<#=Namespace#>;
+
+namespace <#=ProjectName#>.BF.<#=Namespace#>
+{
+    public class BF<#=EntityName#>:ExinBaseBF
+    {
+                //添加
+        public void add(<#=EntityName#>Model data)
+        {
+            DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            data.PID = Guid.NewGuid().ToString();
+            da.Add(data);
+        }
+
+        //更新
+        public void Update(<#=EntityName#>Model data)
+        {
+            DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            var model = da.GetMany(a => a.PID == data.PID).FirstOrDefault();
+            if (model != null)
+            {
+                da.Update(data);
+            }
+        }
+
+        //分页查询
+        public Pagination<<#=EntityName#>Model> ListByPain(int pagaIndex, int pageSize)
+        {
+            DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            return da.QueryMany(a => true).OrderBy(a => a.PID).FetchPage(currentPageIndex: pagaIndex, pageSize: pageSize);
+        }
+
+        //条件查询
+        public List<<#=EntityName#>Model> QueryData()
+        {
+            DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            return da.GetMany(a => true).ToList();
+        }
+
+        public void Delete(<#=EntityName#>Model data)
+        {
+             DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            //没有isDelete的字段情况下使用 Delete 有IsDelete的情况下使用Update
+            <#+
+                if(UtilTemplate.isContain(t,"IsDelete"))
+            {#>
+               data.IsDelete=true;
+                da.Update(data);
+            <#+
+            }else{ #> 
+            da.Delete(data);
+             <#+}#> 
+        }
+
+  
+        /// <summary>
+        /// 通过id获取实体
+        /// </summary>
+        /// <param name="pId"></param>
+        /// <returns></returns>
+        public <#=EntityName#>Model GetModelById(string pId)
+        {
+            DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            <#+
+                if(UtilTemplate.isContain(t,"IsDelete"))
+            {#>
+            return da.GetMany(a => a.PID == pId&&a.IsDelete==false).FirstOrDefault();//要加上isDelete的条件
+           <#+
+            }else{ #> 
+			return da.GetMany(a => a.PID == pId).FirstOrDefault();//要加上isDelete的条件
+			  <#+}#> 
+        }
+
+         
+        /// <summary>
+        /// 映射到DTO上面
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public IQueryable<<#=EntityName#>ModelDTO> GetModelDTO(Expression<Func<<#=EntityName#>Model, bool>> predicate = null)
+        {
+            DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            if (predicate == null)
+            {
+                predicate = model => true;
+            }
+
+            var query = from a in da.DataContext.Set<<#=EntityName#>Model>().Where(a => true)
+                        where predicate.Invoke(a)
+                        select new <#=EntityName#>ModelDTO()
+                        {
+                            <#+
+							int i=0;
+						    foreach (Column c in t.Columns)
+							{
+							i++;
+							#>
+							<#=c.Name#>=a.<#=c.Name#><#+if(t.Columns.Count!=i){#>, <#+}
+							}
+						#>
+                        };
+
+            return query;
+        }
+        
+
+
+    }
+}
+<#+
+            return this.GenerationEnvironment.ToString();
+        }
+    }
+
+
+#>

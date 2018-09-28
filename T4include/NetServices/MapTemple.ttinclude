@@ -1,0 +1,63 @@
+﻿<#+
+    public class MapTemplate:Template
+    {
+	    public MapTemplate(Table table,IEnumerable<string> includeTables):base(table,includeTables)
+        {
+        }
+
+        public override string TransformText()
+        {
+#>
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.ModelConfiguration;
+using exin.Portal.EF.Data.Table;
+using <#=ProjectName#>.Data.<#=Namespace#>;
+
+namespace <#=ProjectName#>.Map.<#=Namespace#>
+{
+    public class <#=EntityName#>Map: EntityTypeConfiguration<<#=EntityName#>Model>
+    {
+        public  <#=EntityName#>Map(string schema = "dbo")
+        {
+            entityMap.ToTable(schema + ".<#=t.Name#>");
+     <#+
+
+            if( primaryKey!=null)
+            {#>
+    entityMap.HasKey(a => a.<#=primaryKey.Name #>);
+            entityMap.Property(a => a.<#=primaryKey.Name #>).HasColumnName("<#=primaryKey.Name #>").IsRequired().HasMaxLength(50);
+<#+
+            }
+            foreach (Column c in t.Columns)
+            {       
+                string colDescription=UtilTemplate.GetColumnDescription(c);
+                string columnEnumType="";
+                if(c.Name!=primaryKey.Name)
+                {
+                    if(c.Name=="Number")
+                    {
+                        #>
+            //数据库自增配置
+            Property(a => a.<#=c.Name #>).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity).HasColumnName("<#=c.Name#>");
+<#+
+                    }                       
+else{
+                        #>
+            Property(a => a.<#=c.Name #>).HasColumnName("<#=c.Name#>");
+<#+
+}
+
+
+                }
+            }
+#>         
+        }
+}
+}
+<#+
+            return this.GenerationEnvironment.ToString();
+        }
+    }
+
+
+#>

@@ -1,0 +1,31 @@
+﻿<#+
+    public class DATemplate:Template
+    {
+	    public DATemplate(Table table,IEnumerable<string> includeTables):base(table,includeTables)
+        {
+        }
+
+        public override string TransformText()
+        {
+#>
+using System;
+using <#=ProjectName#>.Api;
+using <#=ProjectName#>.Data.<#=Namespace#>;
+
+namespace <#=ProjectName#>.DA.<#=Namespace#>
+{
+    public class DA<#=EntityName#>: ExinRepository<<#=EntityName#>Model>
+    {
+        public DA<#=EntityName#>(IUnitOfData dbContext)
+            : base(dbContext)
+        {
+        }
+    }
+}
+<#+
+            return this.GenerationEnvironment.ToString();
+        }
+    }
+
+
+#>

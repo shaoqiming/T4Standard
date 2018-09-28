@@ -1,0 +1,114 @@
+﻿
+<#@ assembly name="Microsoft.SqlServer.Smo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" #>
+<#@ assembly name="Microsoft.SqlServer.ConnectionInfo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" #>
+<#@ assembly name="Microsoft.SqlServer.Dmf, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" #>
+<#@ assembly name="Microsoft.SqlServer.Management.Sdk.Sfc, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" #>
+<#@ assembly name="Microsoft.SqlServer.Management.SmoMetadataProvider, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" #>
+<#@ assembly name="Microsoft.SqlServer.Management.SqlParser, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" #>
+<#@ assembly name="Microsoft.SqlServer.ServiceBrokerEnum, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" #>
+<#@ assembly name="Microsoft.SqlServer.SqlEnum, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" #>
+<#@ assembly name="System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" #>
+<#@ assembly name="System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" #>
+<#@ assembly name="System.Data.Entity.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" #>
+<#@ include file="T4Toolbox.tt" #>
+
+<#@ include file="T4include\Temple.ttinclude" #>
+<#@ include file="T4include\Util.ttinclude"#>
+<#@ include file="T4include\NetServices\ModelTemple.ttinclude" #>
+<#@ include file="T4include\NetServices\MapTemple.ttinclude" #>
+<#@ include file="T4include\NetServices\ModelDTOTemple.ttinclude" #>
+<#@ include file="T4include\NetServices\DATemple.ttinclude" #>
+<#@ include file="T4include\NetServices\BFTemple.ttinclude" #>
+<#@ include file="T4include\NetServices\ServiceTemple.ttinclude" #>
+<#@ include file="T4include\NetServices\DbContextTemplete.ttinclude" #>
+
+
+
+
+
+
+
+
+
+<#@ import namespace="Microsoft.SqlServer.Management.Smo" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ Import Namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Data.SqlClient" #>
+<#@ import namespace="System.Configuration" #>
+
+
+
+<#
+    //获得项目的当前目录位置
+    string currentPath = Path.GetDirectoryName(Host.TemplateFile);
+    string projectPath = currentPath; //currentPath.Substring(0, currentPath.IndexOf(@"\Include"));
+
+    //获得要生成的数据库表集合
+    string includeTableStr=System.IO.File.ReadAllText(projectPath+@"\EntityConfig.txt",Encoding.UTF8);
+    IEnumerable<string> includeTables=includeTableStr.ToLower().Split(new string[]{",","\r\n"},StringSplitOptions.RemoveEmptyEntries).Distinct();
+    
+    //获得数据库的表信息
+    // Data Source=.;Initial Catalog=shaoqiBlog1217;User ID=sa;Password=sa
+    string ConnectionString=@"Data Source=121.199.76.167;Initial Catalog=cwl;Persist Security Info=True;User ID=sa;Password=sa2015";
+    SqlConnection conn = new SqlConnection(ConnectionString);
+    Server s = new Server(new Microsoft.SqlServer.Management.Common.ServerConnection(conn));
+    Database db = s.Databases[conn.Database];
+
+    string projectName="exin.Portal.EF";
+
+    List<ModelTemplate> entitys=new List<ModelTemplate>();
+
+    foreach (Table t in db.Tables)
+    {
+        ModelTemplate modelTemplate=new ModelTemplate(t,includeTables);
+        if(!modelTemplate.IsValidTable()) continue;
+
+        UtilTemplate.projectPath=projectPath;
+        UtilTemplate.nameSpace= modelTemplate.Namespace;
+        UtilTemplate.entityName=modelTemplate.EntityName;
+        modelTemplate.setProjectName(projectName);
+        UtilTemplate.Output(modelTemplate,"Model",modelTemplate.EntityName+"Model.cs");
+
+        entitys.Add(modelTemplate);
+
+        ModelDTOTemplate modelDToTemple=new ModelDTOTemplate(t,includeTables);
+        modelDToTemple.setProjectName(projectName);
+        UtilTemplate.Output(modelDToTemple,"DTO",modelDToTemple.EntityName+"ModelDTO.cs");
+
+        //生成Model
+        MapTemplate mapTemplate=new MapTemplate(t,includeTables);
+        mapTemplate.setProjectName(projectName);
+        UtilTemplate.Output(mapTemplate,"Map",mapTemplate.EntityName+"Map.cs");
+
+        //生成DA
+        DATemplate daTemplate=new DATemplate(t,includeTables);
+        daTemplate.setProjectName(projectName);
+        UtilTemplate.Output(daTemplate,"DA",daTemplate.EntityName+"DA.cs");
+
+        //生成BF
+        BFTemplate bfTemplate=new BFTemplate(t,includeTables);
+        bfTemplate.setProjectName(projectName);
+        UtilTemplate.Output(bfTemplate,"BF",bfTemplate.EntityName+"BF.cs");
+
+        //生产service
+        ServiceTemple serviceTemple=new ServiceTemple(t,includeTables);
+        serviceTemple.setProjectName(projectName);
+        UtilTemplate.Output(serviceTemple,"Service",bfTemplate.EntityName+"Service.cs");
+
+    }
+
+    DbContextTemplete dbcontext=new DbContextTemplete();
+    dbcontext.Entitys=entitys.OrderBy(e=>e.Namespace).ToList();
+    dbcontext.Output.Encoding = Encoding.UTF8;
+    dbcontext.RenderToFile(Path.Combine(projectPath, "ExinDbContext.cs"));
+
+#>
+
+
+

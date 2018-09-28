@@ -1,0 +1,118 @@
+﻿<#+
+    public class Template:CSharpTemplate
+    {
+        public IEnumerable<string> IncludeTables;
+        protected Column primaryKey;
+        protected Table t;
+        protected string RemoveFirstChar="";
+
+        public Template(Table table,IEnumerable<string> includeTables)
+        {
+            this.t=table;
+            this.IncludeTables=includeTables;
+            this.primaryKey=UtilTemplate.GetPrimaryKey(t);
+        }                   
+
+        protected System.Data.Entity.Design.PluralizationServices.PluralizationService service = System.Data.Entity.Design.PluralizationServices.PluralizationService.CreateService(System.Globalization.CultureInfo.GetCultureInfo("en-us"));
+
+        protected string _projectName;
+        public string ProjectName{
+            get{
+                if(string.IsNullOrEmpty(_projectName))
+                {
+                    //给默认值
+                    _projectName="Bronze.HiRead";
+                }
+                return _projectName;
+            }
+        }
+
+        public void setProjectName(string projectName)
+        {
+            if(!string.IsNullOrWhiteSpace(projectName))
+            {
+                this._projectName=projectName;
+            }
+        }           
+
+        protected string _entityName;
+        public string EntityName
+        {
+            get
+            {
+                if(string.IsNullOrEmpty(_entityName))
+                {
+                    _entityName=GetEntityName(this.t.Name,this.RemoveFirstChar);
+                }
+                return _entityName;
+            }
+        }
+
+        protected string _namespace;
+        public string Namespace
+        {
+            get
+            {
+                if(string.IsNullOrEmpty(_namespace))
+                {
+                    _namespace="Systems";
+                    string name = this.t.Name;
+                    if(name.IndexOf("_")>0)
+                    {
+                        string[] names = name.Split('_');
+                        if(names.Length>1){
+                            string space = names[0];
+                            space=space.Substring(0,1).ToUpper()+space.Substring(1,space.Length-1);
+                            _namespace=UtilTemplate.CleanUp(space,RemoveFirstChar);
+                        }
+                    }
+                }
+                return _namespace;
+            }
+        }
+
+
+        protected string _description;
+        public string Description
+        {
+            get
+            {
+                if(string.IsNullOrEmpty(_description))
+                {
+                    _description=UtilTemplate.GetTableDescription(this.t);
+                }
+                return _description;
+            }
+        }
+
+		
+        public bool IsValidTable()
+        {
+            if(!UtilTemplate.IsMyWantTable(t,IncludeTables)) return false;
+            if(primaryKey==null) return false;
+            return true;
+        }
+
+        public string GetEntityName(string tableName,string RemoveFirstChar)
+        {
+            //tableName=tableName.Replace("iTea_","");
+
+            string name = tableName;
+            if(name.IndexOf("_")>0)
+            {
+                string[] names = name.Split('_');
+                if(names.Length>1){
+                    tableName = names[names.Length-1];
+                }
+            }
+
+            string result=UtilTemplate.CleanUp(tableName,RemoveFirstChar);
+            result = service.Singularize(tableName);
+            return result;
+        }
+
+	
+    }
+
+
+#>

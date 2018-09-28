@@ -1,0 +1,69 @@
+﻿<#+
+    public class ServiceTemple:Template
+    {
+	    public ServiceTemple(Table table,IEnumerable<string> includeTables):base(table,includeTables)
+        {
+        }
+
+        public override string TransformText()
+        {
+#>
+using System;
+using exin.FrameWork.Core.Pagination;
+using <#=ProjectName#>.BF.<#=Namespace#>;
+using <#=ProjectName#>.Data.<#=Namespace#>;
+
+namespace <#=ProjectName#>.Service.<#=Namespace#>
+{
+    public class <#=EntityName#>Service
+    {
+                //添加
+        public void add(<#=EntityName#>Model model)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+            model.PID = Guid.NewGuid().ToString();
+            bf.add(model);
+            bf.EFSubmit();
+        }
+
+        //更新
+        public void Update(<#=EntityName#>Model model)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+            bf.Update(model);
+            bf.EFSubmit();
+        }
+
+        public void Delete(string key)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+            var model = bf.GetModelById(key);
+            if (model != null)
+            {
+                bf.Delete(model);
+            }
+
+            bf.EFSubmit();
+        }
+
+        public Pagination<<#=EntityName#>Model> GetListbyPain(int pageIndex, int pageSize)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+            return bf.ListByPain(pageIndex, pageSize);
+        }
+
+        public <#=EntityName#>Model GetDetailByKey(string key)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+            return bf.GetModelById(key);
+        }
+
+    }
+}
+<#+
+            return this.GenerationEnvironment.ToString();
+        }
+    }
+
+
+#>

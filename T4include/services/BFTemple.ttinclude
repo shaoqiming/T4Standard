@@ -1,0 +1,27 @@
+﻿<#+
+    public class BFTemplate:Template
+    {
+	    public BFTemplate(Table table,IEnumerable<string> includeTables):base(table,includeTables)
+        {
+        }
+
+        public override string TransformText()
+        {
+#>
+using System;
+using <#=ProjectName#>.DA.<#=Namespace#>;
+using <#=ProjectName#>.Data.<#=Namespace#>;
+
+namespace <#=ProjectName#>.BF.<#=Namespace#>
+{
+    public class <#=EntityName#>Bf:BlogBaseBF
+    {
+    }
+}
+<#+
+            return this.GenerationEnvironment.ToString();
+        }
+    }
+
+
+#>

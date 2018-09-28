@@ -1,0 +1,46 @@
+﻿<#+
+    public class ModelTemplate:Template
+    {
+	    public ModelTemplate(Table table,IEnumerable<string> includeTables):base(table,includeTables)
+        {
+        }
+
+        public override string TransformText()
+        {
+#>
+using System;
+
+namespace <#=ProjectName#>.Data.<#=Namespace#>
+{
+    public class <#=EntityName#> : BaseModel
+    {
+     <#+
+            foreach (Column c in t.Columns)
+            {       
+                string colDescription=UtilTemplate.GetColumnDescription(c);
+                string columnEnumType="";
+                if(!UtilTemplate.IsBaseField(c.Name))
+                {
+                if(!string.IsNullOrWhiteSpace(colDescription))
+                {
+                    var match=System.Text.RegularExpressions.Regex.Match(colDescription,@"\{(\w+)\}");
+                    if (match.Success){
+                        columnEnumType =match.Groups[1].Value;
+                    }
+ #>
+/// <summary>
+        /// <#=UtilTemplate.ReplaceDescription(colDescription,"")#>
+        /// </summary>
+<#+}if(c.Name!="")#>        public <#=(string.IsNullOrWhiteSpace(columnEnumType)? UtilTemplate.GetSysType(c.DataType.Name):columnEnumType) #><#= UtilTemplate.CheckNullable(c)#> <#=c.Name #> { get; set; }
+        <#+ }}
+#>
+        }
+}
+<#+
+
+            return this.GenerationEnvironment.ToString();
+        }
+    }
+
+
+#>

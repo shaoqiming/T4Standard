@@ -24,14 +24,6 @@
 <#@ include file="T4include\NetServices\ServiceTemple.ttinclude" #>
 <#@ include file="T4include\NetServices\DbContextTemplete.ttinclude" #>
 
-
-
-
-
-
-
-
-
 <#@ import namespace="Microsoft.SqlServer.Management.Smo" #>
 <#@ import namespace="System" #>
 <#@ import namespace="System.IO" #>
@@ -55,7 +47,7 @@
     
     //获得数据库的表信息
     // Data Source=.;Initial Catalog=shaoqiBlog1217;User ID=sa;Password=sa
-    string ConnectionString=@"Data Source=121.199.76.167;Initial Catalog=cwl;Persist Security Info=True;User ID=sa;Password=sa2015";
+
     SqlConnection conn = new SqlConnection(ConnectionString);
     Server s = new Server(new Microsoft.SqlServer.Management.Common.ServerConnection(conn));
     Database db = s.Databases[conn.Database];

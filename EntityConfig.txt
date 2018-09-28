@@ -1,2 +1,2 @@
-﻿^Portal_OnlineUsers
-^Portal_User
+﻿^cwl_shop_\w+
+^cwl_Shop

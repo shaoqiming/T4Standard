@@ -98,18 +98,26 @@
             //tableName=tableName.Replace("iTea_","");
 
             string name = tableName;
-            if(name.IndexOf("_")>0)
+            int index= name.IndexOf("_");
+            if(index>0)
             {
-                string[] names = name.Split('_');
-                if(names.Length>1){
-                    tableName = names[names.Length-1];
-                }
+                //string[] names = name.Split('_');
+                //if(names.Length>1){
+                    //tableName = names[names.Length-1];
+                //}
+
+                tableName=  name.Substring(index+1, name.Length-index-1);
             }
 
             string result=UtilTemplate.CleanUp(tableName,RemoveFirstChar);
             result = service.Singularize(tableName);
+            result = UtilTemplate.TitleToUpper(result);
             return result;
         }
+
+        
+    
+
 
 	
     }

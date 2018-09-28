@@ -47,6 +47,23 @@
         }
 
 
+        public static string TitleToUpper(string str)
+        {
+            if(string.IsNullOrWhiteSpace(str))
+                return string.Empty;
+
+            char[] s = str.ToCharArray();
+            char c = s[0];
+
+            if('a' <= c && c <= 'z')
+                c = (char)(c & ~0x20);
+
+            s[0] = c;
+
+            return new string(s);
+        }    
+
+
         //将java的类型转化为数据库的类型
         public static string GetSysType(string sqlType){
             string sysType="string";

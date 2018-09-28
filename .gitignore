@@ -2,6 +2,12 @@
 bin/  
 obj/  
 .vs/
+
+## customize ignore file
+Code/
+*DbContext.cs
+
+
 # Nuget packages directory  
 
 packages/   

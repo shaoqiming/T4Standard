@@ -20,14 +20,6 @@
     <None Update="TextTemplate1.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>TextTemplate1.cs</LastGenOutput>
-      <LastOutputs>
-.\Code\BF\Portal\UserBF.cs
-.\Code\DA\Portal\UserDA.cs
-.\Code\DTO\Portal\UserModelDTO.cs
-.\Code\Map\Portal\UserMap.cs
-.\Code\Model\Portal\UserModel.cs
-.\Code\Service\Portal\UserService.cs
-</LastOutputs>
     </None>
   </ItemGroup>
 

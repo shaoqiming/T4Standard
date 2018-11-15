@@ -9,7 +9,7 @@
         {
 #>
 using System;
-using exin.FrameWork.Core.Pagination;
+using VarProject.FrameWork.Core.Pagination;
 using <#=ProjectName#>.BF.<#=Namespace#>;
 using <#=ProjectName#>.Data.<#=Namespace#>;
 
@@ -22,6 +22,8 @@ namespace <#=ProjectName#>.Service.<#=Namespace#>
         {
             BF<#=EntityName#> bf = new BF<#=EntityName#>();
             model.PID = Guid.NewGuid().ToString();
+            model.IsDelete = false;
+            model.CreateTime = DateTime.Now;
             bf.add(model);
             bf.EFSubmit();
         }
@@ -46,10 +48,16 @@ namespace <#=ProjectName#>.Service.<#=Namespace#>
             bf.EFSubmit();
         }
 
-        public Pagination<<#=EntityName#>Model> GetListbyPain(int pageIndex, int pageSize)
+        public Pagination<<#=EntityName#>Model> GetListbyPain(string key,int pageIndex, int pageSize)
         {
             BF<#=EntityName#> bf = new BF<#=EntityName#>();
-            return bf.ListByPain(pageIndex, pageSize);
+       <#+
+                if(UtilTemplate.isContain(t,"IsDelete"))
+            {#>
+                 return bf.ListByPain(a => a.IsDelete == false,pageIndex, pageSize);
+<#+        }else{#>
+                return bf.ListByPain(a =>true,pageIndex, pageSize);
+<#+        }#>          
         }
 
         public <#=EntityName#>Model GetDetailByKey(string key)

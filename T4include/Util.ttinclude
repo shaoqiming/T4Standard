@@ -294,7 +294,12 @@
         }
 
 
-
+        //首字母小写
+        public static string StrTopLower(string Str)
+        {
+            string LowerTop = Str.Substring(0, 1).ToLower();
+            return LowerTop + Str.Substring(1, Str.Length-1);
+        }
 
 
         public static string CleanUp(string tableName,string RemoveFirstChar){

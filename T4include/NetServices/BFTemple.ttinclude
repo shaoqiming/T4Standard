@@ -13,7 +13,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using exin.FrameWork.Core.Common;
-using exin.FrameWork.Core.Pagination;
+using VarProject.FrameWork.Core.Pagination;
 using <#=ProjectName#>.DA.<#=Namespace#>;
 using <#=ProjectName#>.Data.<#=Namespace#>;
 
@@ -33,18 +33,16 @@ namespace <#=ProjectName#>.BF.<#=Namespace#>
         public void Update(<#=EntityName#>Model data)
         {
             DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
-            var model = da.GetMany(a => a.PID == data.PID).FirstOrDefault();
-            if (model != null)
-            {
+
                 da.Update(data);
-            }
+            
         }
 
         //分页查询
-        public Pagination<<#=EntityName#>Model> ListByPain(int pagaIndex, int pageSize)
+        public Pagination<<#=EntityName#>Model> ListByPain(Expression<Func<<#=EntityName#>Model, bool>> where,int pagaIndex, int pageSize)
         {
             DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
-            return da.QueryMany(a => true).OrderBy(a => a.PID).FetchPage(currentPageIndex: pagaIndex, pageSize: pageSize);
+            return da.QueryMany(where).OrderBy(a => a.PID).FetchPage(currentPageIndex: pagaIndex, pageSize: pageSize);
         }
 
         //条件查询

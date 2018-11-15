@@ -1,0 +1,170 @@
+﻿<#+
+    public class ControllerMgrTemplate:Template
+    {
+	    public ControllerMgrTemplate(Table table,IEnumerable<string> includeTables):base(table,includeTables)
+        {
+        }
+
+        public override string TransformText()
+        {
+
+            int i=0;
+           string description=UtilTemplate.GetTableDescription(t);
+#>
+using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.Description;
+using VarProject.FrameWork.Core.Api;
+using VarProject.FrameWork.Core.Attribute;
+using VarProject.FrameWork.Core.Enums;
+using VarProject.FrameWork.Core.Pagination;
+using exin.FrameWork.Core.Common;
+using <#=ProjectName#>.Data.<#=Namespace#>;
+using <#=ProjectName#>.Service.<#=Namespace#>;
+
+
+namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
+{
+    
+    /// <summary>
+    /// <#= UtilTemplate.ReplaceDescription(description,"	") #>
+    /// </summary>
+    [RoutePrefix("<#=UtilTemplate.StrTopLower(EntityName)#>Mgr")]
+    [ApiDocument(2.0)]
+    public class <#=EntityName#>MgrController: ApiController
+    {
+
+        /// <summary>
+        /// 添加
+        /// </summary>
+        <#+
+        foreach (Column c in t.Columns)
+            {  if(c.Name=="IsDelete"||c.Name=="PID"||c.Name=="CreateTime") continue;
+                string colDescription=UtilTemplate.GetColumnDescription(c);#>
+        /// <param name="<#=UtilTemplate.StrTopLower(c.Name)#>"><#=UtilTemplate.ReplaceDescription(colDescription,"		")#></param>          
+        <#+}
+        #>
+        /// <returns></returns>
+        [Route("add")]
+        [HttpPost]
+        [MultiParameterSupport]
+        [ResponseType(typeof(ApiResult))]
+        public HttpResponseMessage Add(<#+foreach (Column c in t.Columns){ 
+                i++;
+          if(c.Name=="IsDelete"||c.Name=="PID"||c.Name=="CreateTime") continue;#> 
+        <#= UtilTemplate.GetSysType(c.DataType.Name)#><#= UtilTemplate.CheckNullable(c)#> <#=UtilTemplate.StrTopLower(c.Name)#> <#+if(i!=t.Columns.Count){#> , <#+}}#>)
+        {
+            <#=EntityName#>Model model = new <#=EntityName#>Model();
+            <#=EntityName#>Service service = new <#=EntityName#>Service();
+       <#+
+        foreach (Column c in t.Columns)
+            { 
+            if(c.Name=="IsDelete"||c.Name=="PID"||c.Name=="CreateTime") continue;
+                string colDescription=UtilTemplate.GetColumnDescription(c);#>
+              model.<#=c.Name#> = <#=UtilTemplate.StrTopLower(c.Name)#>;
+        <#+}
+        #>
+            service.add(model);
+            return this.ApiResult(ApiReturnCode.Success, "添加成功");
+        }
+
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="Id">Id</param>
+        /// <returns></returns>
+        [Route("delete")]
+        [HttpPost]
+        [MultiParameterSupport]
+        [ResponseType(typeof(ApiResult))]
+        public HttpResponseMessage Delete(string Id)
+        {
+             <#=EntityName#>Service service = new <#=EntityName#>Service();
+            service.Delete(Id);
+            return this.ApiResult(ApiReturnCode.Success, "删除成功");
+        }
+
+
+
+        /// <summary>
+        ///  列表
+        /// </summary>
+        /// <param name="key">查询关键字</param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        [Route("listPain")]
+        [HttpPost]
+        [MultiParameterSupport]
+        [ResponseType(typeof(ApiResult<Pagination<<#=EntityName#>Model>>))]
+        public HttpResponseMessage ListPain(string key, int? pageIndex = 0, int? pageSize = 10)
+        {
+            pageIndex = pageIndex ?? 0;
+            pageSize = pageSize ?? 10;
+            <#=EntityName#>Service service = new <#=EntityName#>Service();
+            Pagination<<#=EntityName#>Model> data = service.GetListbyPain(key, pageIndex.Value, pageSize.Value);
+            return this.ApiResult(ApiReturnCode.Success, data);
+        }
+
+        
+        /// <summary>
+        /// 更新
+        /// </summary>
+           <#+
+        foreach (Column c in t.Columns)
+            {  if(c.Name=="IsDelete"||c.Name=="PID"||c.Name=="CreateTime") continue;
+                string colDescription=UtilTemplate.GetColumnDescription(c);#>
+        /// <param name="<#=UtilTemplate.StrTopLower(c.Name)#>"><#=UtilTemplate.ReplaceDescription(colDescription,"		")#></param>          
+        <#+}
+        #>
+        /// <returns></returns>
+        [Route("update")]
+        [HttpPost]
+        [MultiParameterSupport]
+        [ResponseType(typeof(ApiResult))]
+        public HttpResponseMessage Update(string id, <#+foreach (Column c in t.Columns){ 
+                i++;
+          if(c.Name=="IsDelete"||c.Name=="PID"||c.Name=="CreateTime") continue;#> 
+        <#= UtilTemplate.GetSysType(c.DataType.Name)#><#= UtilTemplate.CheckNullable(c)#> <#=UtilTemplate.StrTopLower(c.Name)#> <#+if(i!=t.Columns.Count){#> , <#+}}#>)
+        {
+            <#=EntityName#>Service service = new <#=EntityName#>Service();
+            <#=EntityName#>Model model = service.GetDetailByKey(id);
+            if (model == null)
+            {
+                return this.ApiResult(ApiReturnCode.NormalError, "查询不到数据！");
+            }
+            else
+            {   
+                <#+
+                foreach (Column c in t.Columns){ 
+                if(c.Name=="IsDelete"||c.Name=="PID"||c.Name=="CreateTime") continue;   
+                if(UtilTemplate.GetSysType(c.DataType.Name)=="string")
+                {#>
+                   if(!string.IsNullOrWhiteSpace(<#=UtilTemplate.StrTopLower(c.Name)#>))
+                   { 
+                       model.<#=c.Name#>=<#=UtilTemplate.StrTopLower(c.Name)#>;
+                   } 
+                <#+}else{#>
+                   if(<#=UtilTemplate.StrTopLower(c.Name)#>!=null)
+                   { 
+                       model.<#=c.Name#>=<#=UtilTemplate.StrTopLower(c.Name)#>;
+                   } 
+                <#+}
+            } #>
+                service.Update(model);
+                return this.ApiResult(ApiReturnCode.Success, "更新成功！");
+            }
+        }
+
+
+}
+}
+
+<#+
+            return this.GenerationEnvironment.ToString();
+        }
+    }
+
+
+#>

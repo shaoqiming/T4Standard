@@ -1,1 +1,1 @@
-﻿^QDH_(\w+)
+﻿^Portal_User

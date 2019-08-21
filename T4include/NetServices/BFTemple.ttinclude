@@ -127,22 +127,56 @@ namespace <#=ProjectName#>.BF.<#=Namespace#>
         /// <param name="pageSize">页大小</param>
         /// <param name="descStr">排序字段</param>
         /// <returns></returns>
-        public Pagination<<#=EntityName#>DTO>  GetListbyPainComplex(string key, int pageIndex, int pageSize, string descStr)
+        public Pagination<<#=EntityName#>ModelDTO>  GetListbyPainComplex(string key, int pageIndex, int pageSize, string descStr)
         {
+
             DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
             
-            IQueryable<<#=EntityName#>DTO> query = from a in da.DataContext.Set<<#=EntityName#>Model>().AsQueryable
-                              <#+
-							int i=0;
+            IQueryable<<#=EntityName#>ModelDTO> query = from a in da.DataContext.Set<<#=EntityName#>Model>().AsQueryable()
+							<#+
+												foreach (Column c in t.Columns)
+												{
+												 if(c.Name=="GroupID")
+												{#>
+												join g in da.DataContext.Set<GroupModel>().AsQueryable() on a.GroupID equals g.PID
+												<#+}
+												}
+								#><#+
 						    foreach (Column c in t.Columns)
 							{
-							i++;
-                            if(c.EndsWith("_SelSource"))
-                             {
-							#>
-							<#=c.Name#>=a.<#=c.Name#><#+if(t.Columns.Count!=i){#>, <#+}
-							}}
-#>
+								 if(c.Name.EndsWith("_SelSource"))
+								 {
+								var salveTable=UtilTemplate.getSalveTableName(UtilTemplate.GetColumnDescription(c));
+								var salveTableName=GetEntityName2(salveTable,"");
+								var salveTableNameTolow=GetEntityName2(salveTable,"").ToLower();
+								var salveField=UtilTemplate.getSalveFile(UtilTemplate.GetColumnDescription(c));	
+								var lowName=UtilTemplate.StrTopLower(c.Name);
+								#>	join <#=salveTableNameTolow#> in da.DataContext.Set<<#=salveTableName#>Model>().AsQueryable() on a.<#=c.Name#> equals <#=salveTableNameTolow#>.<#=salveField#> into <#=salveTableNameTolow#>Temp
+									from <#=salveTableNameTolow#>result in <#=salveTableNameTolow#>Temp.DefaultIfEmpty()
+								<#+}
+							}#>select new <#=EntityName#>ModelDTO(){<#+  int k=0;
+								    foreach (Column c in t.Columns)
+									{
+										k++;
+										if(c.Name.EndsWith("_SelSource"))
+										{
+								var salveTable=UtilTemplate.getSalveTableName(UtilTemplate.GetColumnDescription(c));
+								var salveTableName=GetEntityName2(salveTable,"");
+								var salveTableNameTolow=GetEntityName2(salveTable,"").ToLower();
+								var salveField=UtilTemplate.getSalveFile(UtilTemplate.GetColumnDescription(c));
+								var SalveValue=UtilTemplate.getSalveValue(UtilTemplate.GetColumnDescription(c));
+											#><#=c.Name#>=a.<#=c.Name#>,
+											<#=c.Name#>Name=<#=salveTableNameTolow#>result.<#=SalveValue#><#+if(t.Columns.Count!=k){#>, <#+}
+										}else if(c.Name=="GroupID")	
+										{
+										#>GroupID=a.GroupID,
+										  GroupName=g.GroupName<#+if(t.Columns.Count!=k){#>, <#+}					
+										}else{					
+											#><#=c.Name#>=a.<#=c.Name#><#+if(t.Columns.Count!=k){#>, <#+}}						
+									}
+							#>};				
+					
+
             if (string.IsNullOrEmpty(descStr))
             {
                 descStr = "Pid descending";
@@ -151,9 +185,6 @@ namespace <#=ProjectName#>.BF.<#=Namespace#>
             return query.OrderBy(descStr).FetchPage(currentPageIndex: pageIndex, pageSize: pageSize);                                                    
 
         }  
-        
-
-
     }
 }
 <#+

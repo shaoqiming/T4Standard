@@ -64,6 +64,48 @@
         }    
 
 
+		public static string getSalveTableName(string str)
+		{
+			var data=resolveMasterSalve(str);
+			if(data.Count>=1)
+			{
+			return data[0].Split('.')[1];
+			}else{
+			return "";
+			}
+			
+		}
+
+		public static string getSalveFile(string str)
+		{
+			var data=resolveMasterSalve(str);
+			if(data.Count>=3)
+			{
+			return data[2].Split('.')[1];
+			}else{
+			return "";
+			}
+		}
+
+		public static string getSalveValue(string str)
+		{
+			var data=resolveMasterSalve(str);
+			if(data.Count>=2)
+			{
+			return data[1].Split('.')[1];
+			}else{
+			return "";
+			}
+		}
+
+		public static List<string> resolveMasterSalve(string str)
+		{
+			int startLength = str.IndexOf("[", StringComparison.Ordinal);
+            var substring = str.Substring(startLength+1, str.Length - startLength-2);
+			var tableinfos= substring.Split('|');
+			return tableinfos.ToList();
+		}
+
         //将java的类型转化为数据库的类型
         public static string GetSysType(string sqlType){
             string sysType="string";

@@ -1,5 +1,5 @@
 ﻿<#+
-    public class MapTemplate:Template
+    public class ControllerTemplate:Template
     {
 	    public MapTemplate(Table table,IEnumerable<string> includeTables):base(table,includeTables)
         {

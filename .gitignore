@@ -6,7 +6,7 @@ obj/
 ## customize ignore file
 Code/
 *DbContext.cs
-
+/Code
 
 # Nuget packages directory  
 

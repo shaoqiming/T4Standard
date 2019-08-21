@@ -40,15 +40,17 @@ namespace <#=ProjectName#>.Map.<#=Namespace#>
             //数据库自增配置
             Property(a => a.<#=c.Name #>).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity).HasColumnName("<#=c.Name#>");
 <#+
-                    }                       
-else{
+                    } 
+                    else if(c.Name.EndsWith("_SelSource")){ #>
+               Property(a => a.<#=c.Name #>).HasColumnName("<#=c.Name#>");
+               Ignore(a => a.<#=c.Name #>Name);
+
+<#+}else{
                         #>
             Property(a => a.<#=c.Name #>).HasColumnName("<#=c.Name#>");
 <#+
-}
-
-
                 }
+}
             }
 #>         
         }

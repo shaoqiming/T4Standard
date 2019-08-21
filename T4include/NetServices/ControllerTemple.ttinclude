@@ -1,0 +1,91 @@
+﻿<#+
+    public class MapTemplate:Template
+    {
+	    public MapTemplate(Table table,IEnumerable<string> includeTables):base(table,includeTables)
+        {
+        }
+
+        public override string TransformText()
+        {
+#>
+
+using exin.FrameWork.Core.Api;
+using exin.FrameWork.Core.Attribute;
+using exin.FrameWork.Core.Common;
+using exin.FrameWork.Core.Enums;
+using exin.FrameWork.Core.Pagination;
+using <#=ProjectName#>.EF.Data.Portal;
+using <#=ProjectName#>.EF.Service.Portal;
+using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.Description;
+
+
+namespace <#=ProjectName#>.Map.<#=Namespace#>
+{
+    public class <#=EntityName#>MController:ApiController
+    {
+        private UserService bf = new UserService();
+        
+        /// <summary>
+        /// 列表
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="pageIndex"></param> 
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        [Route("Index")]
+        [HttpPost]
+        [MultiParameterSupport]
+        [ResponseType(typeof(ApiResult<Pagination<UserModel>>))]
+        public HttpResponseMessage Index(string key = "", int? pageIndex = 0, int? pageSize = 10)
+        {
+            pageIndex = pageIndex ?? 0;
+            pageSize = pageSize ?? 10;
+            //要注意是有多表联查的情况
+            Pagination<UserModel> data = bf.GetListbyManageMangerPain(key, pageIndex.Value, pageSize.Value, "");
+            return this.ApiResult(ApiReturnCode.Success, data);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [Route("Delete")]
+        [HttpPost]
+        [MultiParameterSupport]
+        [ResponseType(typeof(ApiResult))]
+        public HttpResponseMessage Delete(string id)
+        {
+            bf.Delete(id);
+            return this.ApiResult(ApiReturnCode.Success, "删除成功");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [Route("BatchDelete")]
+        [HttpPost]
+        [MultiParameterSupport]
+        [ResponseType(typeof(ApiResult))]
+        public HttpResponseMessage BatchDelete(string ids)
+        {
+            string[] idss = ids.Split(',');
+
+            foreach (string item in idss)
+            {
+                bf.Delete(item);
+            }
+            return this.ApiResult(ApiReturnCode.Success, "删除成功");
+        }
+        
+    }
+}
+<#+
+            return this.GenerationEnvironment.ToString();
+        }
+    }
+
+
+#>

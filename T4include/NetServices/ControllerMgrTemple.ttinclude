@@ -107,6 +107,28 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
             return this.ApiResult(ApiReturnCode.Success, data);
         }
 
+
+
+        /// <summary>
+        ///  列表（有关联表的）
+        /// </summary>
+        /// <param name="key">查询关键字</param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        [Route("listPain")]
+        [HttpPost]
+        [MultiParameterSupport]
+        [ResponseType(typeof(ApiResult<Pagination<<#=EntityName#>Model>>))]
+        public HttpResponseMessage ListPain(string key, int? pageIndex = 0, int? pageSize = 10)
+        {
+            pageIndex = pageIndex ?? 0;
+            pageSize = pageSize ?? 10;
+            <#=EntityName#>Service service = new <#=EntityName#>Service();
+            Pagination<<#=EntityName#>ModelDTO> data = service.GetListbyPainComplex(key, pageIndex.Value, pageSize.Value);
+            return this.ApiResult(ApiReturnCode.Success, data);
+        }
+
         
         /// <summary>
         /// 更新

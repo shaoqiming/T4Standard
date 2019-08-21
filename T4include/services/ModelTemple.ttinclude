@@ -31,7 +31,7 @@ namespace <#=ProjectName#>.Data.<#=Namespace#>
 /// <summary>
         /// <#=UtilTemplate.ReplaceDescription(colDescription,"")#>
         /// </summary>
-<#+}if(c.Name!="")#>        public <#=(string.IsNullOrWhiteSpace(columnEnumType)? UtilTemplate.GetSysType(c.DataType.Name):columnEnumType) #><#= UtilTemplate.CheckNullable(c)#> <#=c.Name #> { get; set; }
+<#+}if(c.Name!="")#>  public <#=(string.IsNullOrWhiteSpace(columnEnumType)? UtilTemplate.GetSysType(c.DataType.Name):columnEnumType) #><#= UtilTemplate.CheckNullable(c)#> <#=c.Name #> { get; set; }
         <#+ }}
 #>
         }

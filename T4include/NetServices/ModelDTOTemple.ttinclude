@@ -26,11 +26,18 @@ namespace <#=ProjectName#>.Data.<#=Namespace#>
                         columnEnumType =match.Groups[1].Value;
                     }
  #>
-/// <summary>
+        /// <summary>
         /// <#=UtilTemplate.ReplaceDescription(colDescription,"")#>
         /// </summary>
 <#+}if(c.Name!="")#>        public <#=(string.IsNullOrWhiteSpace(columnEnumType)? UtilTemplate.GetSysType(c.DataType.Name):columnEnumType) #><#= UtilTemplate.CheckNullable(c)#> <#=c.Name #> { get; set; }
-        <#+ }
+        <#+                if(c.Name.EndsWith("_SelSource")){#>
+                        public string <#=c.Name #>Name { get; set; }
+                            <#+}
+    }
+
+            
+
+
 #>
         }
 }

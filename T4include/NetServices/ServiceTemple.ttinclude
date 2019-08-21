@@ -48,6 +48,15 @@ namespace <#=ProjectName#>.Service.<#=Namespace#>
             bf.EFSubmit();
         }
 
+
+        public Pagination<<#=EntityName#>ModelDTO> GetListbyPainComplex(string key,int pageIndex, int pageSize)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+
+            return bf.GetListbyPainComplex(key, pageIndex, pageSize, descStr);       
+        }
+
+
         public Pagination<<#=EntityName#>Model> GetListbyPain(string key,int pageIndex, int pageSize)
         {
             BF<#=EntityName#> bf = new BF<#=EntityName#>();

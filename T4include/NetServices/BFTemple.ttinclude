@@ -117,6 +117,40 @@ namespace <#=ProjectName#>.BF.<#=Namespace#>
 
             return query;
         }
+
+
+        /// <summary>
+        /// 后台列表显示
+        /// </summary>
+        /// <param name="key">搜索关键字</param>
+        /// <param name="pageIndex">页数</param>
+        /// <param name="pageSize">页大小</param>
+        /// <param name="descStr">排序字段</param>
+        /// <returns></returns>
+        public Pagination<<#=EntityName#>DTO>  GetListbyPainComplex(string key, int pageIndex, int pageSize, string descStr)
+        {
+            DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            
+            IQueryable<<#=EntityName#>DTO> query = from a in da.DataContext.Set<<#=EntityName#>Model>().AsQueryable
+                              <#+
+							int i=0;
+						    foreach (Column c in t.Columns)
+							{
+							i++;
+                            if(c.EndsWith("_SelSource"))
+                             {
+							#>
+							<#=c.Name#>=a.<#=c.Name#><#+if(t.Columns.Count!=i){#>, <#+}
+							}}
+#>
+            if (string.IsNullOrEmpty(descStr))
+            {
+                descStr = "Pid descending";
+            }
+
+            return query.OrderBy(descStr).FetchPage(currentPageIndex: pageIndex, pageSize: pageSize);                                                    
+
+        }  
         
 
 

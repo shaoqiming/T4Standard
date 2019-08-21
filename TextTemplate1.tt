@@ -24,6 +24,10 @@
 <#@ include file="T4include\NetServices\ServiceTemple.ttinclude" #>
 <#@ include file="T4include\NetServices\DbContextTemplete.ttinclude" #>
 <#@ include file="T4include\NetServices\ControllerMgrTemple.ttinclude" #>
+<#@ include file="T4include\NetServices\ControllerTemple.ttinclude" #>
+
+
+
 
 <#@ import namespace="Microsoft.SqlServer.Management.Smo" #>
 <#@ import namespace="System" #>
@@ -51,7 +55,7 @@
     
     //获得数据库的表信息
     // Data Source=.;Initial Catalog=shaoqiBlog1217;User ID=sa;Password=sa
-    String ConnectionString="Data Source=132.232.150.203;Initial Catalog=QDHFYHealth;Persist Security Info=True;User ID=sa;Password=!sq64567758";
+    String ConnectionString="Data Source=.;Initial Catalog=QDHFYHealth;Persist Security Info=True;User ID=sa;Password=!sq64567758";
     SqlConnection conn = new SqlConnection(ConnectionString);
     Server s = new Server(new Microsoft.SqlServer.Management.Common.ServerConnection(conn));
     Database db = s.Databases[conn.Database];
@@ -76,6 +80,12 @@
         ModelDTOTemplate modelDToTemple=new ModelDTOTemplate(t,includeTables);
         modelDToTemple.setProjectName(projectName);
         UtilTemplate.Output(modelDToTemple,"DTO",modelDToTemple.EntityName+"ModelDTO.cs");
+
+
+        //生成Controller
+        ControllerTemple controllerTemple=new ControllerTemple(t,includeTables);
+        controllerTemple.setProjectName(projectName);
+        UtilTemplate.Output(controllerTemple,"Controller",controllerTemple.EntityName+"Controller.cs");
 
         //生成Model
         MapTemplate mapTemplate=new MapTemplate(t,includeTables);

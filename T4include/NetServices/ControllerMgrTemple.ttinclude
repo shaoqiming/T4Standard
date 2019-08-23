@@ -41,11 +41,11 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         [HttpPost]
         [MultiParameterSupport]
         [ResponseType(typeof(ApiResult))]
-        public HttpResponseMessage Add(<#+ int i=0; foreach (Column c in t.Columns){ i++; if(UtilTemplate.IsBaseField(c.Name)) continue;#><#= UtilTemplate.GetSysType(c.DataType.Name)#><#= UtilTemplate.CheckNullable(c)#> <#=UtilTemplate.StrTopLower(c.Name)#><#+if(i!=t.Columns.Count){#>,<#+}}#>)
+        public HttpResponseMessage Add(<#+ int i=0; foreach (Column c in t.Columns){ i++; if(UtilTemplate.IsBaseField(c.Name)||c.Name==primaryKey.Name) continue;#><#= UtilTemplate.GetSysType(c.DataType.Name)#><#= UtilTemplate.CheckNullable(c)#> <#=UtilTemplate.StrTopLower(c.Name)#><#+if(i!=t.Columns.Count){#>,<#+}}#>)
         {
             <#=EntityName#>Model model = new <#=EntityName#>Model();
             <#=EntityName#>Service service = new <#=EntityName#>Service();
-       <#+foreach (Column c in t.Columns){ if(UtilTemplate.IsBaseField(c.Name)) continue;
+       <#+foreach (Column c in t.Columns){ if(UtilTemplate.IsBaseField(c.Name)||c.Name==primaryKey.Name) continue;
                 string colDescription=UtilTemplate.GetColumnDescription(c);#>
               model.<#=c.Name#> = <#=UtilTemplate.StrTopLower(c.Name)#>;
         <#+}
@@ -106,7 +106,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         [HttpPost]
         [MultiParameterSupport]
         [ResponseType(typeof(ApiResult<Pagination<<#=EntityName#>Model>>))]
-        public HttpResponseMessage ListPain(string key, int? pageIndex = 0, int? pageSize = 10)
+        public HttpResponseMessage ListPainComplex(string key, int? pageIndex = 0, int? pageSize = 10)
         {
             pageIndex = pageIndex ?? 0;
             pageSize = pageSize ?? 10;
@@ -118,7 +118,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         
         /// <summary>
         /// 更新
-        /// </summary><#+foreach (Column c in t.Columns){if(UtilTemplate.IsBaseField(c.Name)) continue;string colDescription=UtilTemplate.GetColumnDescription(c);#>
+        /// </summary><#+foreach (Column c in t.Columns){if(UtilTemplate.IsBaseField(c.Name)||c.Name==primaryKey.Name) continue;string colDescription=UtilTemplate.GetColumnDescription(c);#>
         /// <param name="<#=UtilTemplate.StrTopLower(c.Name)#>"><#=UtilTemplate.ReplaceDescription(colDescription,"		")#></param>
 <#+}#>
         /// <returns></returns>
@@ -126,10 +126,10 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         [HttpPost]
         [MultiParameterSupport]
         [ResponseType(typeof(ApiResult))]
-        public HttpResponseMessage Update(<#+  int k=0; foreach (Column c in t.Columns){ k++; if(UtilTemplate.IsBaseField(c.Name)) continue;#> <#= UtilTemplate.GetSysType(c.DataType.Name)#><#= UtilTemplate.CheckNullable(c)#> <#=UtilTemplate.StrTopLower(c.Name)#> <#=k#> <#=t.Columns.Count#> <#+if(k!=t.Columns.Count){#>,<#+}}#>)
+        public HttpResponseMessage Update(<#+ int k=0; foreach (Column c in t.Columns){ k++; if(UtilTemplate.IsBaseField(c.Name)) continue;#> <#= UtilTemplate.GetSysType(c.DataType.Name)#><#= UtilTemplate.CheckNullable(c)#> <#=UtilTemplate.StrTopLower(c.Name)#><#+if(UtilTemplate.GetSysType(c.DataType.Name)=="String"){#>=null<#+}#><#+if(k!=t.Columns.Count){#>,<#+}}#>)
         {
             <#=EntityName#>Service service = new <#=EntityName#>Service();
-            <#=EntityName#>Model model = service.GetDetailByKey(id);
+            <#=EntityName#>Model model = service.GetDetailByKey(pID);
             if (model == null)
             {
                 return this.ApiResult(ApiReturnCode.NormalError, "查询不到数据！");
@@ -138,7 +138,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
             {   
                 <#+
                 foreach (Column c in t.Columns){ 
-                if(UtilTemplate.IsBaseField(c.Name)) continue;   
+                if(UtilTemplate.IsBaseField(c.Name)||c.Name==primaryKey.Name) continue;   
                 if(UtilTemplate.GetSysType(c.DataType.Name)=="string")
                 {#>
                    if(!string.IsNullOrWhiteSpace(<#=UtilTemplate.StrTopLower(c.Name)#>)){  model.<#=c.Name#>=<#=UtilTemplate.StrTopLower(c.Name)#>;} 

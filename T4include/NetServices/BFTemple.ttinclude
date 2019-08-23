@@ -154,7 +154,9 @@ namespace <#=ProjectName#>.BF.<#=Namespace#>
 								#>	join <#=salveTableNameTolow#> in da.DataContext.Set<<#=salveTableName#>Model>().AsQueryable() on a.<#=c.Name#> equals <#=salveTableNameTolow#>.<#=salveField#> into <#=salveTableNameTolow#>Temp
 									from <#=salveTableNameTolow#>result in <#=salveTableNameTolow#>Temp.DefaultIfEmpty()
 								<#+}
-							}#>select new <#=EntityName#>ModelDTO(){<#+  int k=0;
+							}#>
+                            where a.IsDelete == false || a.IsDelete == null
+                            select new <#=EntityName#>ModelDTO(){<#+  int k=0;
 								    foreach (Column c in t.Columns)
 									{
 										k++;
@@ -166,7 +168,7 @@ namespace <#=ProjectName#>.BF.<#=Namespace#>
 								var salveField=UtilTemplate.getSalveFile(UtilTemplate.GetColumnDescription(c));
 								var SalveValue=UtilTemplate.getSalveValue(UtilTemplate.GetColumnDescription(c));
 											#><#=c.Name#>=a.<#=c.Name#>,
-											<#=c.Name#>Name=<#=salveTableNameTolow#>result.<#=SalveValue#><#+if(t.Columns.Count!=k){#>, <#+}
+											<#=c.Name#>Name=<#=salveTableNameTolow#>result==null?"":<#=salveTableNameTolow#>result.<#=SalveValue#><#+if(t.Columns.Count!=k){#>, <#+}
 										}else if(c.Name=="GroupID")	
 										{
 										#>GroupID=a.GroupID,

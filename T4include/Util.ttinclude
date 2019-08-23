@@ -23,7 +23,7 @@
 
         public static bool IsBaseField(string name)
         {
-            if(name=="CreateTime"||name=="CreateUser"||name=="DeleteTime"||name=="DeleteUser"||name=="UpdateTime"||name=="UpdateUser"||name=="UseValue1"||name=="UseValue2"||name=="TIMESSTAMP"||name=="IsDelete")
+            if(name=="CreateTime"||name=="CreateUser"||name=="DeleteTime"||name=="DeleteUser"||name=="UpdateTime"||name=="UpdateUser"||name=="UseValue1"||name=="UseValue2"||name=="TIMESSTAMP"||name=="IsDelete"||name=="Number")
             {
                 return true;
             }else{

@@ -12,6 +12,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Linq.Expressions;
 using exin.FrameWork.Core.Common;
 using VarProject.FrameWork.Core.Pagination;
 using <#=ProjectName#>.DA.<#=Namespace#>;
@@ -120,7 +121,39 @@ namespace <#=ProjectName#>.BF.<#=Namespace#>
 
 
         /// <summary>
-        /// 后台列表显示
+        /// 根据出入的linq语句进行查询
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="exps">条件</param>
+        /// <param name="key">关键字</param>
+        /// <param name="isDesc">是否降序</param>
+        /// <returns></returns>
+        public List<<#=EntityName#>Model> CustomQuery<T>(Func<<#=EntityName#>Model, bool> exps, Func<<#=EntityName#>Model, T> key, bool isDesc = false)
+        {
+            DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            if (isDesc)
+            {
+                return da.GetMany(exps).OrderByDescending(key).ToList();
+            }
+            return da.GetMany(exps).OrderBy(key).ToList();
+        }
+
+        /// <summary>
+        /// 根据出入的linq语句进行查询
+        /// </summary>
+        /// <param name="exps">关键字</param>
+        /// <param name="key">升序</param>
+        /// <returns></returns>
+        public List<<#=EntityName#>Model> CustomQuery(Expression<Func<<#=EntityName#>Model, bool>> exps, string key)
+        {
+           DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            return da.QueryMany(exps).OrderBy(key).ToList();
+        }
+
+
+
+        /// <summary>
+        /// 后台列表显示(也是多表联查的数据)
         /// </summary>
         /// <param name="key">搜索关键字</param>
         /// <param name="pageIndex">页数</param>
@@ -132,16 +165,7 @@ namespace <#=ProjectName#>.BF.<#=Namespace#>
 
             DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
             
-            IQueryable<<#=EntityName#>ModelDTO> query = from a in da.DataContext.Set<<#=EntityName#>Model>().AsQueryable()
-							<#+
-												foreach (Column c in t.Columns)
-												{
-												 if(c.Name=="GroupID")
-												{#>
-												join g in da.DataContext.Set<GroupModel>().AsQueryable() on a.GroupID equals g.PID
-												<#+}
-												}
-								#><#+
+            IQueryable<<#=EntityName#>ModelDTO> query = from a in da.DataContext.Set<<#=EntityName#>Model>().AsQueryable()<#+
 						    foreach (Column c in t.Columns)
 							{
 								 if(c.Name.EndsWith("_SelSource"))
@@ -169,16 +193,21 @@ namespace <#=ProjectName#>.BF.<#=Namespace#>
 								var SalveValue=UtilTemplate.getSalveValue(UtilTemplate.GetColumnDescription(c));
 											#><#=c.Name#>=a.<#=c.Name#>,
 											<#=c.Name#>Name=<#=salveTableNameTolow#>result==null?"":<#=salveTableNameTolow#>result.<#=SalveValue#><#+if(t.Columns.Count!=k){#>, <#+}
-										}else if(c.Name=="GroupID")	
-										{
-										#>GroupID=a.GroupID,
-										  GroupName=g.GroupName<#+if(t.Columns.Count!=k){#>, <#+}					
 										}else{					
 											#><#=c.Name#>=a.<#=c.Name#><#+if(t.Columns.Count!=k){#>, <#+}}						
 									}
 							#>};				
-					
+				
+            if (!string.IsNullOrEmpty(key))
+            {
+                 query = query.Where(a => <#+int ke=0; for(int s=0;s<t.Columns.Count;s++)
+                        {
+                        if(UtilTemplate.GetSysType(t.Columns[s].DataType.Name)=="string"&&!UtilTemplate.IsBaseField(t.Columns[s].Name)&&!t.Columns[s].Name.EndsWith("ID")&&!t.Columns[s].Name.EndsWith("_SelSource"))
+                            { if(ke!=0){#>||<#+} ke++; #>a.<#=t.Columns[s].Name#>.Contains(key) <#+}
+                        }#>);                
+            }
 
+	
             if (string.IsNullOrEmpty(descStr))
             {
                 descStr = "Pid descending";

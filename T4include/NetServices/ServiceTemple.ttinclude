@@ -9,6 +9,8 @@
         {
 #>
 using System;
+using System.Linq.Expressions;
+using System.Collections.Generic;
 using VarProject.FrameWork.Core.Pagination;
 using <#=ProjectName#>.BF.<#=Namespace#>;
 using <#=ProjectName#>.Data.<#=Namespace#>;
@@ -49,11 +51,12 @@ namespace <#=ProjectName#>.Service.<#=Namespace#>
         }
 
 
+
         public Pagination<<#=EntityName#>ModelDTO> GetListbyPainComplex(string key,int pageIndex, int pageSize)
         {
             BF<#=EntityName#> bf = new BF<#=EntityName#>();
 
-            return bf.GetListbyPainComplex(key, pageIndex, pageSize, descStr);       
+            return bf.GetListbyPainComplex(key, pageIndex, pageSize, "");       
         }
 
 
@@ -73,6 +76,19 @@ namespace <#=ProjectName#>.Service.<#=Namespace#>
         {
             BF<#=EntityName#> bf = new BF<#=EntityName#>();
             return bf.GetModelById(key);
+        }
+
+
+        public List<<#=EntityName#>Model> CustomQuery<T>(Func<<#=EntityName#>Model, bool> exps, Func<<#=EntityName#>Model, T> key, bool isDesc = false)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+            return bf.CustomQuery(exps, key, isDesc);
+        }
+
+        public List<<#=EntityName#>Model> CustomQuery(Expression<Func<<#=EntityName#>Model, bool>> exps, string key)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+            return bf.CustomQuery(exps, key);
         }
 
     }

@@ -9,13 +9,18 @@
         {
            string description=UtilTemplate.GetTableDescription(t);
 #>
+
+using System;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 using exin.FrameWork.Core.Common;
-using System;
-using <#=ProjectName#>.Data.<#=Namespace#>;
-using <#=ProjectName#>.Service.<#=Namespace#>;
+using exin.FrameWork.Core.Api;
+using exin.FrameWork.Core.Attribute;
+using exin.FrameWork.Core.Enums;
+using exin.FrameWork.Core.Pagination;
+using <#=ProjectName#>.EF.Data.<#=Namespace#>;
+using <#=ProjectName#>.EF.Service.<#=Namespace#>;
 
 
 namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
@@ -41,7 +46,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         [HttpPost]
         [MultiParameterSupport]
         [ResponseType(typeof(ApiResult))]
-        public HttpResponseMessage Add(<#+ int i=0; foreach (Column c in t.Columns){ i++; if(UtilTemplate.IsBaseField(c.Name)||c.Name==primaryKey.Name) continue;#><#= UtilTemplate.GetSysType(c.DataType.Name)#><#= UtilTemplate.CheckNullable(c)#> <#=UtilTemplate.StrTopLower(c.Name)#><#+if(i!=t.Columns.Count){#>,<#+}}#>)
+        public HttpResponseMessage Add(<#+int i=0; foreach (Column c in t.Columns){if(UtilTemplate.IsBaseField(c.Name)||c.Name==primaryKey.Name) continue; if(i!=0){#>,<#+} i++;#> <#= UtilTemplate.GetSysType(c.DataType.Name)#><#= UtilTemplate.CheckNullable(c)#> <#=UtilTemplate.StrTopLower(c.Name)#><#+}#>)
         {
             <#=EntityName#>Model model = new <#=EntityName#>Model();
             <#=EntityName#>Service service = new <#=EntityName#>Service();
@@ -50,6 +55,12 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
               model.<#=c.Name#> = <#=UtilTemplate.StrTopLower(c.Name)#>;
         <#+}
         #>
+
+
+            //UserModel userInfo = this.GetUserInfo();
+            //user.CreateUser = userInfo.UserID;
+            model.CreateTime = DateTime.Now;
+            model.IsDelete = false;
             service.add(model);
             return this.ApiResult(ApiReturnCode.Success, "添加成功");
         }
@@ -126,7 +137,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         [HttpPost]
         [MultiParameterSupport]
         [ResponseType(typeof(ApiResult))]
-        public HttpResponseMessage Update(<#+ int k=0; foreach (Column c in t.Columns){ k++; if(UtilTemplate.IsBaseField(c.Name)) continue;#> <#= UtilTemplate.GetSysType(c.DataType.Name)#><#= UtilTemplate.CheckNullable(c)#> <#=UtilTemplate.StrTopLower(c.Name)#><#+if(UtilTemplate.GetSysType(c.DataType.Name)=="String"){#>=null<#+}#><#+if(k!=t.Columns.Count){#>,<#+}}#>)
+        public HttpResponseMessage Update(<#+ int k=0; foreach (Column c in t.Columns){if(UtilTemplate.IsBaseField(c.Name)) continue; if(k!=0){#>,<#+} k++;#> <#= UtilTemplate.GetSysType(c.DataType.Name)#><#= UtilTemplate.CheckNullable(c)#> <#=UtilTemplate.StrTopLower(c.Name)#><#+if(UtilTemplate.GetSysType(c.DataType.Name)=="String"){#>=null<#+}}#>)
         {
             <#=EntityName#>Service service = new <#=EntityName#>Service();
             <#=EntityName#>Model model = service.GetDetailByKey(pID);
@@ -146,6 +157,11 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
                    if(<#=UtilTemplate.StrTopLower(c.Name)#>!=null){ model.<#=c.Name#>=<#=UtilTemplate.StrTopLower(c.Name)#>;} 
                 <#+}
             } #>
+
+                //UserModel userInfo = this.GetUserInfo();
+                //model.UpdateUser = userInfo.PID;
+                model.UpdateTime = DateTime.Now;
+                    
                 service.Update(model);
                 return this.ApiResult(ApiReturnCode.Success, "更新成功！");
             }

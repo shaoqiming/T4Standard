@@ -11,10 +11,10 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Linq.Dynamic;
 using System.Linq.Expressions;
-using System.Linq.Expressions;
+using exin.FrameWork.Core.Pagination;
 using exin.FrameWork.Core.Common;
-using VarProject.FrameWork.Core.Pagination;
 using <#=ProjectName#>.DA.<#=Namespace#>;
 using <#=ProjectName#>.Data.<#=Namespace#>;
 
@@ -210,7 +210,7 @@ namespace <#=ProjectName#>.BF.<#=Namespace#>
 	
             if (string.IsNullOrEmpty(descStr))
             {
-                descStr = "Pid descending";
+                descStr = "CreateTime descending";
             }
 
             return query.OrderBy(descStr).FetchPage(currentPageIndex: pageIndex, pageSize: pageSize);                                                    

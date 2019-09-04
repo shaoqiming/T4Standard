@@ -9,10 +9,11 @@
         {
 #>
 using System;
+using exin.Portal.EF.Data.Model;
 
 namespace <#=ProjectName#>.Data.<#=Namespace#>
 {
-    public class <#=EntityName#>ModelDTO
+    public class <#=EntityName#>ModelDTO:BaseModel
     {
      <#+
             foreach (Column c in t.Columns)
@@ -22,6 +23,9 @@ namespace <#=ProjectName#>.Data.<#=Namespace#>
                 if(!string.IsNullOrWhiteSpace(colDescription))
                 {
                     var match=System.Text.RegularExpressions.Regex.Match(colDescription,@"\{(\w+)\}");
+
+                     if(UtilTemplate.IsBaseField(c.Name))continue;
+
                     if (match.Success){
                         columnEnumType =match.Groups[1].Value;
                     }

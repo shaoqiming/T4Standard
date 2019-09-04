@@ -1,1 +1,1 @@
-﻿^Portal_User
+﻿^Portal_(\w+)

@@ -11,7 +11,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Collections.Generic;
-using VarProject.FrameWork.Core.Pagination;
+using exin.FrameWork.Core.Pagination;
 using <#=ProjectName#>.BF.<#=Namespace#>;
 using <#=ProjectName#>.Data.<#=Namespace#>;
 

@@ -40,7 +40,6 @@
 <#@ import namespace="System.Configuration" #>
 
 
-
 <#
 
     //还有两个问题 一个BF父类的名称 一个是DA父类的名称
@@ -73,7 +72,7 @@
         UtilTemplate.nameSpace= modelTemplate.Namespace;
         UtilTemplate.entityName=modelTemplate.EntityName;
         modelTemplate.setProjectName(projectName);
-        //UtilTemplate.Output(modelTemplate,"Model",modelTemplate.EntityName+"Model.cs");
+        UtilTemplate.Output(modelTemplate,"Model",modelTemplate.EntityName+"Model.cs");
 
         entitys.Add(modelTemplate);
 
@@ -81,32 +80,32 @@
         modelDToTemple.setProjectName(projectName);
         UtilTemplate.Output(modelDToTemple,"DTO",modelDToTemple.EntityName+"ModelDTO.cs");
 
-//
-        ////生成Controller
+
+        //生成Controller
         //ControllerTemple controllerTemple=new ControllerTemple(t,includeTables);
         //controllerTemple.setProjectName(projectName);
         //UtilTemplate.Output(controllerTemple,"Controller",controllerTemple.EntityName+"Controller.cs");
-//
-        ////生成Model
-        //MapTemplate mapTemplate=new MapTemplate(t,includeTables);
-        //mapTemplate.setProjectName(projectName);
-        //UtilTemplate.Output(mapTemplate,"Map",mapTemplate.EntityName+"Map.cs");
-//
-        ////生成DA
-        //DATemplate daTemplate=new DATemplate(t,includeTables);
-        //daTemplate.setProjectName(projectName);
-        //UtilTemplate.Output(daTemplate,"DA",daTemplate.EntityName+"DA.cs");
-//
+
+        //生成Model
+        MapTemplate mapTemplate=new MapTemplate(t,includeTables);
+        mapTemplate.setProjectName(projectName);
+        UtilTemplate.Output(mapTemplate,"Map",mapTemplate.EntityName+"Map.cs");
+
+        //生成DA
+        DATemplate daTemplate=new DATemplate(t,includeTables);
+        daTemplate.setProjectName(projectName);
+        UtilTemplate.Output(daTemplate,"DA",daTemplate.EntityName+"DA.cs");
+
         //生成BF
         BFTemplate bfTemplate=new BFTemplate(t,includeTables);
         bfTemplate.setProjectName(projectName);
         UtilTemplate.Output(bfTemplate,"BF",bfTemplate.EntityName+"BF.cs");
 
-        ////生产service
-        //ServiceTemple serviceTemple=new ServiceTemple(t,includeTables);
-        //serviceTemple.setProjectName(projectName);
-        //UtilTemplate.Output(serviceTemple,"Service",bfTemplate.EntityName+"Service.cs");
-//
+        //生产service
+        ServiceTemple serviceTemple=new ServiceTemple(t,includeTables);
+        serviceTemple.setProjectName(projectName);
+        UtilTemplate.Output(serviceTemple,"Service",bfTemplate.EntityName+"Service.cs");
+
 
         //生成Controller
         ControllerMgrTemplate controllerTemplate=new ControllerMgrTemplate(t,includeTables);
@@ -115,10 +114,10 @@
 
     }
 
-    //DbContextTemplete dbcontext=new DbContextTemplete();
-    //dbcontext.Entitys=entitys.OrderBy(e=>e.Namespace).ToList();
-    //dbcontext.Output.Encoding = Encoding.UTF8;
-    //dbcontext.RenderToFile(Path.Combine(projectPath, "ExinDbContext.cs"));
+    DbContextTemplete dbcontext=new DbContextTemplete();
+    dbcontext.Entitys=entitys.OrderBy(e=>e.Namespace).ToList();
+    dbcontext.Output.Encoding = Encoding.UTF8;
+    dbcontext.RenderToFile(Path.Combine(projectPath, "ExinDbContext.cs"));
 
 #>
 

@@ -51,15 +51,6 @@ namespace <#=ProjectName#>.Service.<#=Namespace#>
         }
 
 
-
-        public Pagination<<#=EntityName#>ModelDTO> GetListbyPainComplex(string key,int pageIndex, int pageSize)
-        {
-            BF<#=EntityName#> bf = new BF<#=EntityName#>();
-
-            return bf.GetListbyPainComplex(key, pageIndex, pageSize, "");       
-        }
-
-
         public Pagination<<#=EntityName#>Model> GetListbyPain(string key,int pageIndex, int pageSize)
         {
             BF<#=EntityName#> bf = new BF<#=EntityName#>();
@@ -76,6 +67,13 @@ namespace <#=ProjectName#>.Service.<#=Namespace#>
         {
             BF<#=EntityName#> bf = new BF<#=EntityName#>();
             return bf.GetModelById(key);
+        }
+
+        public Pagination<<#=EntityName#>ModelDTO> GetListbyPainComplex(string key,int pageIndex, int pageSize)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+
+            return bf.GetListbyPainComplex(key, pageIndex, pageSize, "");       
         }
 
 

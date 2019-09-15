@@ -26,6 +26,7 @@ using exin.FrameWork.Core.Enums;
 using exin.FrameWork.Core.Pagination;
 using exin.Portal.WebApi.Utils;
 using System.Collections.Generic;
+using exin.Portal.EF.Data.Portal;
 using <#=ProjectName#>.EF.Data.<#=Namespace#>;
 using <#=ProjectName#>.EF.Service.<#=Namespace#>;
 
@@ -36,7 +37,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
     /// <summary>
     /// <#= UtilTemplate.ReplaceDescription(description,"	") #>
     /// </summary>
-    [RoutePrefix("admin/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr")]
+    [RoutePrefix("hzcg/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr")]
     [ApiDocument(2.0)]
     public class <#=EntityName#>MgrController: ApiController
     {
@@ -68,7 +69,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
               model.<#=c.Name#> = <#=UtilTemplate.StrTopLower(c.Name)#>;
         <#+}
         #>
-
+            model.GroupID = userinfo.GroupID;
             model.CreateUser = userinfo.PID;
             model.CreateTime = DateTime.Now;
             model.IsDelete = false;
@@ -249,7 +250,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         public HttpResponseMessage GetButtonRight()
         {
             UserModel userinfo = this.GetUserInfo();
-            string rtn = MenuUtil.GetMouldeHtml("admin/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr/Index", userinfo.PID);
+            object rtn = MenuUtil.GetMouldeHtml("admin/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr/Index", userinfo.PID);
             return this.ApiResult(ApiReturnCode.Success, rtn);
         }
 

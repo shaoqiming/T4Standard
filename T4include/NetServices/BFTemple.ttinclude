@@ -213,9 +213,102 @@ namespace <#=ProjectName#>.BF.<#=Namespace#>
                 descStr = "CreateTime descending";
             }
 
-            return query.OrderBy(descStr).FetchPage(currentPageIndex: pageIndex, pageSize: pageSize);                                                    
-
+            return query.OrderBy(descStr).FetchPage(currentPageIndex: pageIndex, pageSize: pageSize);                                           
         }  
+
+        #region 删除
+
+        public void IdDelete(List<string> id, bool isSoftDelete = true, string opUserId = null)
+        {
+            DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            List<<#=EntityName#>Model> data = null;
+            if (isSoftDelete)
+            {
+                data = da.GetMany(a => id.Contains(a.PID) && (a.IsDelete == false || a.IsDelete == null)).ToList();
+            }
+            else
+            {
+                data = da.GetMany(a => id.Contains(a.PID)).ToList();
+            }
+
+            if (data.Count > 0)
+            {
+                if (isSoftDelete)
+                {
+                    foreach (<#=EntityName#>Model item in data)
+                    {
+                        item.IsDelete = true;
+                        item.UpdateUser = opUserId;
+                        item.UpdateTime = DateTime.Now;
+                        Update(item);
+                    }
+                }
+                else
+                {
+                    foreach (<#=EntityName#>Model item in data)
+                    {
+                         da.Delete(item);
+                    }
+                }
+            }
+        }
+
+        public void IdDelete(string id, bool isSoftDelete = true, string opUserId = null)
+        {
+            DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            <#=EntityName#>Model data = null;
+            if (isSoftDelete)
+            {
+                data = da.GetMany(a => a.PID == id && (a.IsDelete == false || a.IsDelete == null)).FirstOrDefault();
+            }
+            else
+            {
+                data = da.GetMany(a => a.PID == id).FirstOrDefault();
+            }
+
+            if (data != null)
+            {
+                if (isSoftDelete)
+                {
+                    data.IsDelete = true;
+                    data.UpdateUser = opUserId;
+                    data.UpdateTime = DateTime.Now;
+                    Update(data);
+                }
+                else
+                {
+                     da.Delete(data);
+                }
+            }
+        }
+
+        public void WhereDelete(Expression<Func<<#=EntityName#>Model, bool>> exps, bool isSoftDelete = true, string opUserId = null)
+        {
+            DA<#=EntityName#> da = new DA<#=EntityName#>(UnitOfData);
+            if (isSoftDelete)
+            {
+                List<<#=EntityName#>Model> data = da.QueryMany(exps).Where(a => a.IsDelete == false || a.IsDelete == null).ToList();
+                foreach (<#=EntityName#>Model item in data)
+                {
+                    item.IsDelete = true;
+                    item.UpdateUser = opUserId;
+                    item.UpdateTime = DateTime.Now;
+                    Update(item);
+                }
+            }
+            else
+            {
+                List<<#=EntityName#>Model> data = da.QueryMany(exps).ToList();
+                foreach (<#=EntityName#>Model item in data)
+                {
+                     da.Delete(item);
+                }
+            }
+        }
+
+        #endregion
+
+			
     }
 }
 <#+

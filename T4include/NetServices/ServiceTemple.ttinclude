@@ -89,6 +89,51 @@ namespace <#=ProjectName#>.Service.<#=Namespace#>
             return bf.CustomQuery(exps, key);
         }
 
+
+
+		#region 删除
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="isSoftDelete"></param>
+        /// <param name="opUserId"></param>
+        public void IdDelete(List<string> id, bool isSoftDelete = true, string opUserId = null)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+            bf.IdDelete(id, isSoftDelete, opUserId);
+			bf.EFSubmit();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="isSoftDelete"></param>
+        /// <param name="opUserId"></param>
+        public void IdDelete(string id, bool isSoftDelete = true, string opUserId = null)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+            bf.IdDelete(id, isSoftDelete, opUserId);
+			bf.EFSubmit();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exps"></param>
+        /// <param name="isSoftDelete"></param>
+        /// <param name="opUserId"></param>
+        public void WhereDelete(Expression<Func<<#=EntityName#>Model, bool>> exps, bool isSoftDelete = true, string opUserId = null)
+        {
+            BF<#=EntityName#> bf = new BF<#=EntityName#>();
+            bf.WhereDelete(exps, isSoftDelete, opUserId);
+			bf.EFSubmit();
+        }
+
+        #endregion
+
     }
 }
 <#+

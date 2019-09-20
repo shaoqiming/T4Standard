@@ -3,6 +3,7 @@
     {
         public IEnumerable<string> IncludeTables;
         protected Column primaryKey;
+        protected string Prefix;
         protected Table t;
         protected string RemoveFirstChar="";
 
@@ -62,6 +63,7 @@
                         string[] names = name.Split('_');
                         if(names.Length>1){
                             string space = names[0];
+                            Prefix=space;
                             space=space.Substring(0,1).ToUpper()+space.Substring(1,space.Length-1);
                             _namespace=UtilTemplate.CleanUp(space,RemoveFirstChar);
                         }

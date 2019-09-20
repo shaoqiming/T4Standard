@@ -51,6 +51,10 @@
     //获得要生成的数据库表集合
     string includeTableStr=System.IO.File.ReadAllText(projectPath+@"\EntityConfig.txt",Encoding.UTF8);
     IEnumerable<string> includeTables=includeTableStr.ToLower().Split(new string[]{",","\r\n"},StringSplitOptions.RemoveEmptyEntries).Distinct();
+
+    //获得需要生成的controler
+    string ControllerStr=System.IO.File.ReadAllText(projectPath+@"\ControllerConfig.txt",Encoding.UTF8);
+    IEnumerable<string> controllerTables=ControllerStr.ToLower().Split(new string[]{",","\r\n"},StringSplitOptions.RemoveEmptyEntries).Distinct();
     
     //获得数据库的表信息
     // Data Source=.;Initial Catalog=shaoqiBlog1217;User ID=sa;Password=sa
@@ -86,29 +90,29 @@
         //controllerTemple.setProjectName(projectName);
         //UtilTemplate.Output(controllerTemple,"Controller",controllerTemple.EntityName+"Controller.cs");
 
-        //生成Model
-        MapTemplate mapTemplate=new MapTemplate(t,includeTables);
-        mapTemplate.setProjectName(projectName);
-        UtilTemplate.Output(mapTemplate,"Map",mapTemplate.EntityName+"Map.cs");
+        ////生成Model
+        //MapTemplate mapTemplate=new MapTemplate(t,includeTables);
+        //mapTemplate.setProjectName(projectName);
+        //UtilTemplate.Output(mapTemplate,"Map",mapTemplate.EntityName+"Map.cs");
 
-        //生成DA
-        DATemplate daTemplate=new DATemplate(t,includeTables);
-        daTemplate.setProjectName(projectName);
-        UtilTemplate.Output(daTemplate,"DA",daTemplate.EntityName+"DA.cs");
+        ////生成DA
+        //DATemplate daTemplate=new DATemplate(t,includeTables);
+        //daTemplate.setProjectName(projectName);
+        //UtilTemplate.Output(daTemplate,"DA",daTemplate.EntityName+"DA.cs");
 
-        //生成BF
-        BFTemplate bfTemplate=new BFTemplate(t,includeTables);
-        bfTemplate.setProjectName(projectName);
-        UtilTemplate.Output(bfTemplate,"BF",bfTemplate.EntityName+"BF.cs");
+        ////生成BF
+        //BFTemplate bfTemplate=new BFTemplate(t,includeTables);
+        //bfTemplate.setProjectName(projectName);
+        //UtilTemplate.Output(bfTemplate,"BF",bfTemplate.EntityName+"BF.cs");
 
-        //生产service
-        ServiceTemple serviceTemple=new ServiceTemple(t,includeTables);
-        serviceTemple.setProjectName(projectName);
-        UtilTemplate.Output(serviceTemple,"Service",bfTemplate.EntityName+"Service.cs");
+        ////生产service
+        //ServiceTemple serviceTemple=new ServiceTemple(t,includeTables);
+        //serviceTemple.setProjectName(projectName);
+        //UtilTemplate.Output(serviceTemple,"Service",bfTemplate.EntityName+"Service.cs");
 
 
         //生成Controller
-        ControllerMgrTemplate controllerTemplate=new ControllerMgrTemplate(t,includeTables);
+        ControllerMgrTemplate controllerTemplate=new ControllerMgrTemplate(t,controllerTables);
         controllerTemplate.setProjectName(projectName);
         UtilTemplate.Output(controllerTemplate,"Controller",controllerTemplate.EntityName+"MgrController.cs");
 

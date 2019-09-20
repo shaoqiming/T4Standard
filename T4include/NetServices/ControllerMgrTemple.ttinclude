@@ -37,11 +37,12 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
     /// <summary>
     /// <#= UtilTemplate.ReplaceDescription(description,"	") #>
     /// </summary>
-    [RoutePrefix("hzcg/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr")]
+    [RoutePrefix("<#=Prefix#>/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr")]
     [ApiDocument(2.0)]
     public class <#=EntityName#>MgrController: ApiController
     {
 
+        string UrlMode="/<#=Prefix#>/<#=t.Name#>/Index";
         /// <summary>
         /// 添加
         /// </summary>
@@ -58,7 +59,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         {
           
             UserModel userinfo = this.GetUserInfo();
-            if (!MenuUtil.HasUserPower(userinfo.PID, "admin/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr/Index", "add"))
+            if (!MenuUtil.HasUserPower(userinfo.PID,UrlMode , "add"))
             {
                 return this.ApiResult(ApiReturnCode.NoPower, "没有权限");
             }
@@ -90,7 +91,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         public HttpResponseMessage Delete(string Id)
         {
             UserModel userinfo = this.GetUserInfo();
-            if (!MenuUtil.HasUserPower(userinfo.PID, "admin/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr/Index", "del"))
+            if (!MenuUtil.HasUserPower(userinfo.PID, UrlMode, "del"))
             {
                 return this.ApiResult(ApiReturnCode.NoPower, "没有权限");
             }
@@ -120,7 +121,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
 
             UserModel userinfo = this.GetUserInfo();
 
-            if (!MenuUtil.HasUserPower(userinfo.PID, "admin/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr/Index", "add"))
+            if (!MenuUtil.HasUserPower(userinfo.PID, UrlMode, "add"))
             {
                 return this.ApiResult(ApiReturnCode.NoPower, "没有权限");
             }
@@ -128,7 +129,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
             <#=EntityName#>Service service = new <#=EntityName#>Service();
             Pagination<<#=EntityName#>ModelDTO> data = service.GetListbyPainComplex(key, page.Value, limit.Value);
 
-            List<string> button = MenuUtil.GetModButton("admin/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr/Index", userinfo.PID);
+            List<string> button = MenuUtil.GetModButton(UrlMode, userinfo.PID);
             data.ButtonRight = "";
             if (button.Count > 0)
             {
@@ -155,7 +156,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         
             UserModel userinfo = this.GetUserInfo();
 
-            if (!MenuUtil.HasUserPower(userinfo.PID, "admin/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr/Index", "edit"))
+            if (!MenuUtil.HasUserPower(userinfo.PID, UrlMode, "edit"))
             {
                 return this.ApiResult(ApiReturnCode.NoPower, "没有权限");
             }
@@ -220,7 +221,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         {
             UserModel userinfo = this.GetUserInfo();
 
-            if (!MenuUtil.HasUserPower(userinfo.PID, "admin/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr/Index", "del"))
+            if (!MenuUtil.HasUserPower(userinfo.PID,UrlMode, "del"))
             {
                 return this.ApiResult(ApiReturnCode.NoPower, "没有权限");
             }
@@ -250,7 +251,7 @@ namespace <#=ProjectName#>.WebApi.Controller.<#=Namespace#>
         public HttpResponseMessage GetButtonRight()
         {
             UserModel userinfo = this.GetUserInfo();
-            object rtn = MenuUtil.GetMouldeHtml("admin/<#=UtilTemplate.StrTopLower(EntityName)#>Mgr/Index", userinfo.PID);
+            object rtn = MenuUtil.GetMouldeHtml(UrlMode, userinfo.PID);
             return this.ApiResult(ApiReturnCode.Success, rtn);
         }
 
